@@ -9,13 +9,18 @@ import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.*;
+import java.util.HashSet;
 
 public class Main{
     public static int byteCount = 0;
     public static final String baseFileName = "TWEET_FILE";
     public static int fileCnt = 0; //CHANGE THIS VALUE WHENEVER THIS PROGRAM STOPS
     public static int tweetCnt = 0; //COUNTING # OF TWEETS SEEN
+    public static int tweetByteCnt = 0;
     public static final int MAX_TWEET_CNT = 250; //CAP FOR DETECTING DUPES
+    public static final int MAX_BYTE_CNT = 10 * 1024^2;
+
+    public static HashSet<Long> tweetIdHash = new HashSet<Long>();
 
     public static File currentFile; //CURRENT FILE BEING I/O'd TO
     public static OutputStreamWriter stream;
@@ -31,6 +36,21 @@ public class Main{
         StatusListener statusListener = new StatusListener() {
             public void onStatus(Status status) {
                 try {
+                    //DUPLICATE DETECTION
+                    long id = status.getId();
+                    if (tweetCnt < MAX_TWEET_CNT) {
+                        ++tweetCnt;
+                        if (tweetIdHash.contains(id)) {
+                            return;
+                        } else {
+                            tweetIdHash.add(id);
+                        }
+                    } else {
+                        tweetCnt = 1;
+                        tweetIdHash.clear();
+                        tweetIdHash.add(id);
+                    }
+
                     org.json.JSONObject object = new JSONObject();
                     object.put("name", status.getUser().getScreenName());
 
@@ -64,11 +84,12 @@ public class Main{
                         object.put("url_list", urlArray);
                     }
 
-                    if (tweetCnt < MAX_TWEET_CNT) {
-                        tweetCnt += 1;
+                    String jsonString = object.toString() + "\n";
+                    if (tweetByteCnt < MAX_BYTE_CNT) {
+                        tweetByteCnt += jsonString.getBytes().length;
                         stream.write(object.toString());
                     } else {
-                        tweetCnt = 1;
+                        tweetByteCnt = jsonString.getBytes().length;
                         fileCnt++;
                         stream.close();
 
@@ -76,6 +97,7 @@ public class Main{
                         try {
                             currentFile.createNewFile();
                             stream = new OutputStreamWriter(new FileOutputStream(currentFile), "UTF8");
+                            stream.write(jsonString);
                         } catch (Exception e) {
                             System.out.println("CREATING FILE WENT WRONG");
                             System.exit(-1);
