@@ -1,10 +1,10 @@
 package Part1;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.JSONObject;/*
 import org.jsoup.Jsoup;
 import org.nibor.autolink.LinkExtractor;
-import org.nibor.autolink.LinkSpan;
+import org.nibor.autolink.LinkSpan;*/
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -13,7 +13,7 @@ import java.util.HashSet;
 
 public class Main{
     public static int byteCount = 0;
-    public static final String baseFileName = "TWEET_FILE";
+    /*public static final String baseFileName = "TWEET_FILE";
     public static int fileCnt = 0; //CHANGE THIS VALUE WHENEVER THIS PROGRAM STOPS
     public static int tweetCnt = 0; //COUNTING # OF TWEETS SEEN
     public static int tweetByteCnt = 0;
@@ -24,7 +24,7 @@ public class Main{
 
     public static File currentFile; //CURRENT FILE BEING I/O'd TO
     public static OutputStreamWriter stream;
-
+    */
     public static void main(String [] args) {
         ConfigurationBuilder config = new ConfigurationBuilder();
         config.setOAuthConsumerKey("K8P38gSDQUTk1Et7QAxDg5a1B")
@@ -35,7 +35,7 @@ public class Main{
         TwitterStream twitterStream = new TwitterStreamFactory(config.build()).getInstance();
         StatusListener statusListener = new StatusListener() {
             public void onStatus(Status status) {
-                try {
+              /*  try {
                     //DUPLICATE DETECTION
                     long id = status.getId();
                     if (tweetCnt < MAX_TWEET_CNT) {
@@ -108,7 +108,7 @@ public class Main{
                     System.out.println("YOUR JSON CODE SUCKS");
                 } catch (IOException e) {
                     System.out.println("UNABLE TO WRITE JSON TO FILE");
-                }
+                }*/
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
@@ -131,8 +131,9 @@ public class Main{
                 ex.printStackTrace();
             }
         };
-        twitterStream.addListener(statusListener);
 
+        twitterStream.addListener(statusListener);
+        /*
         currentFile = new File(baseFileName + Integer.toString(fileCnt));
         try {
             currentFile.createNewFile();
@@ -141,7 +142,7 @@ public class Main{
             System.out.println("CREATING FILE WENT WRONG");
             return;
         }
-
+        */
         twitterStream.sample();
     }
 }
