@@ -7,24 +7,23 @@ import org.nibor.autolink.LinkExtractor;
 import org.nibor.autolink.LinkSpan;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
-
+import java.util.HashSet;
 import java.io.*;
 import java.util.HashSet;
 
 public class Main{
     public static int byteCount = 0;
-    /*public static final String baseFileName = "TWEET_FILE";
+    public static final String baseFileName = "TWEET_FILE";
     public static int fileCnt = 0; //CHANGE THIS VALUE WHENEVER THIS PROGRAM STOPS
     public static int tweetCnt = 0; //COUNTING # OF TWEETS SEEN
     public static int tweetByteCnt = 0;
     public static final int MAX_TWEET_CNT = 250; //CAP FOR DETECTING DUPES
     public static final int MAX_BYTE_CNT = 10 * 1024^2;
 
-    public static HashSet<Long> tweetIdHash = new HashSet<Long>();
+    HashSet tweetIdHash = new HashSet();
 
     public static File currentFile; //CURRENT FILE BEING I/O'd TO
     public static OutputStreamWriter stream;
-    */
     public static void main(String [] args) {
         ConfigurationBuilder config = new ConfigurationBuilder();
         config.setOAuthConsumerKey("K8P38gSDQUTk1Et7QAxDg5a1B")
