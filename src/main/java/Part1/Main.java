@@ -20,7 +20,7 @@ public class Main{
     public static final int MAX_TWEET_CNT = 250; //CAP FOR DETECTING DUPES
     public static final int MAX_BYTE_CNT = 10 * 1024^2;
 
-    HashSet tweetIdHash = new HashSet();
+    public static HashSet<Long> tweetIdHash = new HashSet<Long>();
 
     public static File currentFile; //CURRENT FILE BEING I/O'd TO
     public static OutputStreamWriter stream;
@@ -34,9 +34,11 @@ public class Main{
         TwitterStream twitterStream = new TwitterStreamFactory(config.build()).getInstance();
         StatusListener statusListener = new StatusListener() {
             public void onStatus(Status status) {
-              /*  try {
+                try {
+
                     //DUPLICATE DETECTION
                     long id = status.getId();
+                    int int_id = (int) id;
                     if (tweetCnt < MAX_TWEET_CNT) {
                         ++tweetCnt;
                         if (tweetIdHash.contains(id)) {
@@ -49,7 +51,7 @@ public class Main{
                         tweetIdHash.clear();
                         tweetIdHash.add(id);
                     }
-
+                    /*
                     org.json.JSONObject object = new JSONObject();
                     object.put("name", status.getUser().getScreenName());
 
@@ -102,12 +104,16 @@ public class Main{
                             System.exit(-1);
                         }
                     }
-
-                } catch (org.json.JSONException e) {
+                    */
+                }catch (IndexOutOfBoundsException e) {
+                    System.err.println("IndexOutOfBoundsException: " + e.getMessage());
+                } /*
+                catch (org,json.JSONException e) {
                     System.out.println("YOUR JSON CODE SUCKS");
                 } catch (IOException e) {
                     System.out.println("UNABLE TO WRITE JSON TO FILE");
-                }*/
+                } */
+
             }
 
             public void onDeletionNotice(StatusDeletionNotice statusDeletionNotice) {
