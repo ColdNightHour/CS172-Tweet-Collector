@@ -10,20 +10,26 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.util.HashSet;
 import java.io.*;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.lang.*;
 
 public class Main{
     public static int byteCount = 0;
     public static final String baseFileName = "TWEET_FILE";
-    public static int fileCnt = 0; //CHANGE THIS VALUE WHENEVER THIS PROGRAM STOPS
     public static int tweetCnt = 0; //COUNTING # OF TWEETS SEEN
     public static int tweetByteCnt = 0;
-    public static final int MAX_TWEET_CNT = 250; //CAP FOR DETECTING DUPES
-    public static final int MAX_BYTE_CNT = 10 * 1024^2;
-
+    public static final long MAX_TWEET_CNT = 1000000000L; //CAP FOR DETECTING DUPES
+    public static final long MAX_BYTE_CNT = 26843545600L; //Each tweet isa bout 200 Bytes, we want files of about 25 MB, 150000000 tweets is about 25 MB
+    /*Files of size 150000000*/
     public static HashSet<Long> tweetIdHash = new HashSet<Long>();
-
     public static File currentFile; //CURRENT FILE BEING I/O'd TO
     public static OutputStreamWriter stream;
+    public static String location = "NULL";
+    public static Boolean run = true;
+    public static StringBuilder buffer = new StringBuilder("");
+    public static int fileCnt = 1;
     public static void main(String [] args) {
         ConfigurationBuilder config = new ConfigurationBuilder();
         config.setOAuthConsumerKey("K8P38gSDQUTk1Et7QAxDg5a1B")
@@ -36,83 +42,88 @@ public class Main{
             public void onStatus(Status status) {
                 try {
 
-                    //DUPLICATE DETECTION
-                    long id = status.getId();
-                    int int_id = (int) id;
-                    if (tweetCnt < MAX_TWEET_CNT) {
-                        ++tweetCnt;
-                        if (tweetIdHash.contains(id)) {
-                            return;
-                        } else {
-                            tweetIdHash.add(id);
-                        }
-                    } else {
-                        tweetCnt = 1;
-                        tweetIdHash.clear();
-                        tweetIdHash.add(id);
+                  //DUPLICATE DETECTION
+                  long id = status.getId();
+                  int int_id = (int) id;
+                  if (tweetCnt < MAX_TWEET_CNT) {
+                      ++tweetCnt;
+                      if (tweetIdHash.contains(id)) {
+                          System.out.println("DUPLICATE");
+                          return;
+                      } else {
+                          tweetIdHash.add(id);
+                      }
+                  } else {
+                      tweetCnt = 1;
+                      tweetIdHash.clear();
+                      tweetIdHash.add(id);
+                  }
+                  String msg = status.getText();
+                  org.json.JSONObject object = new JSONObject();
+                  object.put("name", status.getUser().getScreenName());
+                  object.put("message", msg);
+                  object.put("timestamp", status.getCreatedAt());
+                  if((status.getGeoLocation()) == null)
+                    location = "Null";
+                  else
+                    location = status.getGeoLocation().toString();
+                  object.put("location", location);
+                  //TODO: All this parse-y URL stuff should be done in a runnable.
+                  //Prolly pass in the incomplete JSON object to runnable so that runnable finishes the job
+                  org.json.JSONArray urlArray = new JSONArray();
+                  String [] parts = msg.split("\\s+");
+                  // Attempt to convert each item into an URL.
+                  for( String item : parts ) try {
+                      URL url = new URL(item);
+                      org.json.JSONObject urlBundle = new JSONObject();
+                      urlBundle.put("url", url);
+                      // If possible then replace with anchor...
+                      try {
+                          urlBundle.put("url_title", Jsoup.connect(url.toString()).get().title()); //TODO: FUCKING DO THIS
+                      } catch (IOException e) {
+                          urlBundle.put("url_title", "Could not parse title");
+                      } catch(IllegalArgumentException e) {
+                        urlBundle.put("url_title", "Exception for illegal argument");
+                      }
+                      urlArray.put(urlBundle);
+                  } catch (MalformedURLException e) {
+                      // If there was an URL that was not it!...
+                  }
+
+                  if (urlArray.length() > 0) {
+                      object.put("url_list", urlArray);
+                  }
+                  else
+                    object.put("url_list", "NULL");
+                  String jsonString = object.toString() + "\n";
+
+                  tweetByteCnt+=jsonString.getBytes().length;
+                  buffer.append(jsonString);
+                  if(tweetByteCnt >= MAX_BYTE_CNT) {
+                    tweetByteCnt = 0;
+                    try{
+                      PrintWriter writer = new PrintWriter("./tweets/file" + fileCnt + ".txt", "UTF-8");
+                      System.out.println("FILE WRITTEN");
+                      writer.println(buffer);
+                      writer.close();
+                      fileCnt++;
+                      buffer.setLength(0);
                     }
-                    /*
-                    org.json.JSONObject object = new JSONObject();
-                    object.put("name", status.getUser().getScreenName());
+                    catch(FileNotFoundException e) {
 
-                    String msg = status.getText();
-                    object.put("message", msg);
-                    object.put("timestamp", status.getCreatedAt().toString());
-                    object.put("location", status.getGeoLocation().toString());
-
-                    //TODO: All this parse-y URL stuff should be done in a runnable.
-                    //Prolly pass in the incomplete JSON object to runnable so that runnable finishes the job
-                    LinkExtractor linkExtractor = LinkExtractor.builder().build();
-                    Iterable<LinkSpan> links = linkExtractor.extractLinks(msg);
-                    LinkSpan link;
-
-                    org.json.JSONArray urlArray = new JSONArray();
-                    while ((link = links.iterator().next()) != null) {
-                        JSONObject urlBundle = new JSONObject();
-                        String url = msg.substring(link.getBeginIndex(), link.getEndIndex());
-                        urlBundle.put("url", url);
-
-                        try {
-                            urlBundle.put("url_title", Jsoup.connect("http://example.com/").get().title()); //TODO: FUCKING DO THIS
-                        } catch (IOException e) {
-                            System.out.println("Unable to parse title.");
-                        }
-
-                        urlArray.put(urlBundle);
                     }
+                    catch(UnsupportedEncodingException e) {
 
-                    if (urlArray.length() > 0) {
-                        object.put("url_list", urlArray);
                     }
+                  }
 
-                    String jsonString = object.toString() + "\n";
-                    if (tweetByteCnt < MAX_BYTE_CNT) {
-                        tweetByteCnt += jsonString.getBytes().length;
-                        stream.write(object.toString());
-                    } else {
-                        tweetByteCnt = jsonString.getBytes().length;
-                        fileCnt++;
-                        stream.close();
-
-                        currentFile = new File(baseFileName + Integer.toString(fileCnt));
-                        try {
-                            currentFile.createNewFile();
-                            stream = new OutputStreamWriter(new FileOutputStream(currentFile), "UTF8");
-                            stream.write(jsonString);
-                        } catch (Exception e) {
-                            System.out.println("CREATING FILE WENT WRONG");
-                            System.exit(-1);
-                        }
-                    }
-                    */
-                }catch (IndexOutOfBoundsException e) {
+                } catch (IndexOutOfBoundsException e) {
+                    System.out.println("ERROR");
                     System.err.println("IndexOutOfBoundsException: " + e.getMessage());
-                } /*
-                catch (org,json.JSONException e) {
+                }
+                catch (org.json.JSONException e) {
                     System.out.println("YOUR JSON CODE SUCKS");
-                } catch (IOException e) {
-                    System.out.println("UNABLE TO WRITE JSON TO FILE");
-                } */
+                }
 
             }
 
