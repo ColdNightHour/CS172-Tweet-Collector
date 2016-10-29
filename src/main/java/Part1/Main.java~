@@ -30,8 +30,8 @@ public class Main{
     public static String location = "NULL";
     public static Boolean run = true;
     public static StringBuffer buffer = new StringBuffer("");
-    public static int fileCnt = 17;
-    public static int filePassCnt = 9;
+    public static int fileCnt = 9;
+    public static int filePassCnt = 6;
     public static long overallBytes = 0;
     public static PrintWriter writer;
     public static void main(String [] args) {
@@ -165,7 +165,7 @@ public class Main{
         twitterStream.addListener(statusListener);
       //  twitterStream.sample("en");
 
-        double [][] boundingbox = {{-121.7099473, 31.6558962},{-83.4119626,47.8417964}};
+        double [][] boundingbox = {{-121.7099473, 31.6558962},{-93.3316897, 44.9707969}};
         FilterQuery filter = new FilterQuery();
         filter.locations(boundingbox);
         twitterStream.filter(filter);
