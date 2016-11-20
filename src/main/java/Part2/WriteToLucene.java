@@ -9,7 +9,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,12 +84,11 @@ public class WriteToLucene {
 
     public static void main(String [] args) throws IOException{
         StandardAnalyzer sA = new StandardAnalyzer();
-        Directory index = new RAMDirectory();
         IndexWriterConfig config = new IndexWriterConfig(sA);
         File indexDir = new File("./LuceneIndex");
         indexDir.mkdir();
         Directory d = FSDirectory.open(indexDir.toPath());
-        IndexWriter w = new IndexWriter(index, config);
+        IndexWriter w = new IndexWriter(d, config);
         w.deleteAll();
 
         File[] files = new File(dir).listFiles();
