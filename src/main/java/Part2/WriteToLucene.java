@@ -17,23 +17,22 @@ import org.nibor.autolink.LinkExtractor;
 import org.nibor.autolink.LinkSpan;
 import org.nibor.autolink.LinkType;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.EnumSet;
+import java.util.NoSuchElementException;
 
 /**
  * Created by jman0_000 on 11/19/2016.
  */
 public class WriteToLucene {
 
-    public static String dir = ""; //DIRECTORY WHERE OUR TWEETS ARE STORED
+    public static String dir = "C:\\Users\\jman0_000\\Documents\\Tweets"; //DIRECTORY WHERE OUR TWEETS ARE STORED
 
     public static void addDoc(IndexWriter w, String line) {
         try {
+            //System.out.println(line);
             Document doc = new Document();
-            JSONObject tweet = new JSONObject(doc);
+            JSONObject tweet = new JSONObject(line);
 
             doc.add(new StringField("name", tweet.getString("name"), Field.Store.YES));
 
@@ -49,20 +48,38 @@ public class WriteToLucene {
                 .linkTypes(EnumSet.of(LinkType.URL)) // limit to URLs
                 .build();
             Iterable<LinkSpan> links = linkExtractor.extractLinks(message);
-            for (LinkSpan link = links.iterator().next();
-                 link != null; link = links.iterator().next()) {
-                String url = message.substring(link.getBeginIndex(), link.getEndIndex());
 
-                try {
-                    doc.add(new TextField("url_titles", Jsoup.connect(url).get().title(), Field.Store.YES));
-                } catch (IOException e) {}
+            try {
+                for (LinkSpan link : links) {
+                    String url = message.substring(link.getBeginIndex(), link.getEndIndex());
+                    System.out.println("Getting title of: " + url);
+                    try {
+                        doc.add(new TextField("url_titles", Jsoup.connect(url).get().title(), Field.Store.YES));
+                    } catch (IOException e) {
+                        System.out.println("Unable to parse URL " + url);
+                    }
+                }
+            } catch (NoSuchElementException e) {
+                System.out.println("No urls in this tweet!");
             }
 
             JSONArray hashtagArr = tweet.getJSONArray("hashTags");
             for (int i = 0; i < hashtagArr.length(); ++i) {
                 doc.add(new StringField("hashtags", hashtagArr.getString(i), Field.Store.YES));
             }
-        } catch (JSONException e) {}
+
+            w.addDocument(doc);
+            System.out.println("Indexed a tweet!");
+        } catch (JSONException | IOException e) {
+            System.out.println(getStackTrace(e));
+        }
+    }
+
+    public static String getStackTrace(Throwable aThrowable) {
+        final Writer result = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(result);
+        aThrowable.printStackTrace(printWriter);
+        return result.toString();
     }
 
     public static void main(String [] args) throws IOException{
@@ -72,16 +89,24 @@ public class WriteToLucene {
         IndexWriter w = new IndexWriter(index, config);
 
         File[] files = new File(dir).listFiles();
-        for (File f : files) {
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(f));
+        System.out.println("Go through files in " + dir);
+        try {
+            for (File f : files) {
+                try {
+                    System.out.println("Parsing file " + f.getName());
+                    BufferedReader br = new BufferedReader(new FileReader(f));
 
-                for (String line = br.readLine(); line != null; line = br.readLine()) {
-                    addDoc(w, line);
+                    for (String line = br.readLine(); line != null; line = br.readLine()) {
+                        addDoc(w, line);
+                    }
+
+                    w.close();
+                } catch (IOException e1) {
+                    System.out.println(getStackTrace(e1));
                 }
-
-                w.close();
-            } catch (IOException e1) {}
+            }
+        } catch (NullPointerException e) {
+            System.out.println(getStackTrace(e));
         }
     }
 }

@@ -20,6 +20,16 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/../gson-2.8.0-javadoc.jar!/" />
+        </JAVADOC>
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-core:6.3.0" level="project" />
     <orderEntry type="library" name="Maven: org.twitter4j:twitter4j-core:4.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.twitter4j:twitter4j-stream:4.0.5" level="project" />
