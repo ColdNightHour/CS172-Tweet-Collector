@@ -103,11 +103,12 @@ public class WriteToLucene {
                         addDoc(w, line);
                     }
 
-                    w.close();
                 } catch (IOException e1) {
                     System.out.println(getStackTrace(e1));
                 }
             }
+
+            w.close();
         } catch (NullPointerException e) {
             System.out.println(getStackTrace(e));
         }
