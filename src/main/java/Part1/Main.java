@@ -2,19 +2,11 @@ package Part1;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.nibor.autolink.LinkExtractor;
-import org.nibor.autolink.LinkSpan;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
-import java.util.HashSet;
+
 import java.io.*;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.lang.*;
-import java.io.File;
 
 public class Main{
     public static int byteCount = 0;
@@ -30,8 +22,8 @@ public class Main{
     public static String location = "NULL";
     public static Boolean run = true;
     public static StringBuffer buffer = new StringBuffer("");
-    public static int fileCnt = 17;
-    public static int filePassCnt = 9;
+    public static int fileCnt = 48;
+    public static int filePassCnt = 5;
     public static long overallBytes = 0;
     public static PrintWriter writer;
     public static void main(String [] args) {
