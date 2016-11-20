@@ -8,6 +8,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,7 +56,7 @@ public class WriteToLucene {
                     System.out.println("Getting title of: " + url);
                     try {
                         doc.add(new TextField("url_titles", Jsoup.connect(url).get().title(), Field.Store.YES));
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         System.out.println("Unable to parse URL " + url);
                     }
                 }
@@ -86,7 +87,11 @@ public class WriteToLucene {
         StandardAnalyzer sA = new StandardAnalyzer();
         Directory index = new RAMDirectory();
         IndexWriterConfig config = new IndexWriterConfig(sA);
+        File indexDir = new File("./LuceneIndex");
+        indexDir.mkdir();
+        Directory d = FSDirectory.open(indexDir.toPath());
         IndexWriter w = new IndexWriter(index, config);
+        w.deleteAll();
 
         File[] files = new File(dir).listFiles();
         System.out.println("Go through files in " + dir);
