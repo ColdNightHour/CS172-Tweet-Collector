@@ -7,6 +7,9 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.json.JSONArray;
@@ -109,6 +112,12 @@ public class WriteToLucene {
             }
 
             w.close();
+
+            try{
+                Query q = new QueryParser("message", sA).parse("potato");
+            } catch (ParseException e){
+
+            }
         } catch (NullPointerException e) {
             System.out.println(getStackTrace(e));
         }
