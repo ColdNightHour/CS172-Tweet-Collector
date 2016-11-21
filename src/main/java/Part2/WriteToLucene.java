@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
  */
 public class WriteToLucene {
 
-    public static String dir = "C:\\Users\\jman0_000\\Documents\\TweetTest"; //DIRECTORY WHERE OUR TWEETS ARE STORED
+    public static String dir = "C:\\Users\\jman0_000\\Documents\\TweetSample"; //DIRECTORY WHERE OUR TWEETS ARE STORED
 
     public static void addDoc(IndexWriter w, String line) {
         try {
@@ -95,7 +95,7 @@ public class WriteToLucene {
         indexDir.mkdir();
         Directory d = FSDirectory.open(indexDir.toPath());
         IndexWriter w = new IndexWriter(d, config);
-        w.deleteAll();
+        //w.deleteAll();
 
         File[] files = new File(dir).listFiles();
         System.out.println("Go through files in " + dir);
