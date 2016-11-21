@@ -72,8 +72,8 @@ public class WriteToLucene {
                 arr.add(hashtagArr.getString(i));
             }
 
-            doc.add(new StringField("hashtags", arr.toString(), Field.Store.YES));
-            
+            doc.add(new TextField("hashtags", arr.toString(), Field.Store.YES));
+
             w.addDocument(doc);
             System.out.println("Indexed a tweet!");
         } catch (JSONException | IOException e) {
