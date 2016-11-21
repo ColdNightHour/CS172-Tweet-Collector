@@ -7,9 +7,6 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.json.JSONArray;
@@ -21,7 +18,9 @@ import org.nibor.autolink.LinkSpan;
 import org.nibor.autolink.LinkType;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -29,7 +28,7 @@ import java.util.NoSuchElementException;
  */
 public class WriteToLucene {
 
-    public static String dir = "C:\\Users\\jman0_000\\Documents\\Tweets"; //DIRECTORY WHERE OUR TWEETS ARE STORED
+    public static String dir = "C:\\Users\\jman0_000\\Documents\\TweetTest"; //DIRECTORY WHERE OUR TWEETS ARE STORED
 
     public static void addDoc(IndexWriter w, String line) {
         try {
@@ -67,10 +66,14 @@ public class WriteToLucene {
             }
 
             JSONArray hashtagArr = tweet.getJSONArray("hashTags");
+            List<String> arr = new ArrayList<String>();
             for (int i = 0; i < hashtagArr.length(); ++i) {
-                doc.add(new StringField("hashtags", hashtagArr.getString(i), Field.Store.YES));
+                //System.out.println("Hashtag: " + hashtagArr.getString(i));
+                arr.add(hashtagArr.getString(i));
             }
 
+            doc.add(new StringField("hashtags", arr.toString(), Field.Store.YES));
+            
             w.addDocument(doc);
             System.out.println("Indexed a tweet!");
         } catch (JSONException | IOException e) {
@@ -113,11 +116,6 @@ public class WriteToLucene {
 
             w.close();
 
-            try{
-                Query q = new QueryParser("message", sA).parse("potato");
-            } catch (ParseException e){
-
-            }
         } catch (NullPointerException e) {
             System.out.println(getStackTrace(e));
         }
