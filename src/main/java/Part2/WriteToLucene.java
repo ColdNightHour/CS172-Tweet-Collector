@@ -1,10 +1,7 @@
 package Part2;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -18,10 +15,9 @@ import org.nibor.autolink.LinkSpan;
 import org.nibor.autolink.LinkType;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by jman0_000 on 11/19/2016.
@@ -39,10 +35,14 @@ public class WriteToLucene {
             doc.add(new StringField("name", tweet.getString("name"), Field.Store.YES));
 
             String location = tweet.getString("location");
-            doc.add(new StringField("location",
-                location.equals("Null") ? "" : location, Field.Store.NO));
+            doc.add(new StoredField("location", location.equals("Null") ? "" : location));
 
-            doc.add(new StringField("timestamp", tweet.getString("timestamp"), Field.Store.NO));
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH::mm:ss zzz YYY");
+                long time = sdf.parse(tweet.getString("timestamp")).getTime();
+                doc.add(new NumericDocValuesField("timestamp", time));
+            } catch (ParseException e) {
+            }
 
             String message = tweet.getString("message");
             doc.add(new TextField("message", message, Field.Store.YES));
