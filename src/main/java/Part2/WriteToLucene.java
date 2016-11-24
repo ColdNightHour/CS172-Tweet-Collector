@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  */
 public class WriteToLucene {
 
-    public static String dir = "C:\\Users\\jman0_000\\Documents\\TweetSample"; //DIRECTORY WHERE OUR TWEETS ARE STORED
+    public static String dir = "/home/coldnighthour/Documents/tweet"; //DIRECTORY WHERE OUR TWEETS ARE STORED
 
     public static void addDoc(IndexWriter w, String line) {
         try {

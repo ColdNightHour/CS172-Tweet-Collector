@@ -45,7 +45,7 @@ public class QueryLucene {
     boosts.put("message", (float)(10.0));
     try{
       //System.out.println(args[0]);
-      Query q = new MultiFieldQueryParser(new String[] {"name", "hashtags", "message", "url_titles", "timestamp", "location"}, analyzer, boosts).parse("this is it");
+      Query q = new MultiFieldQueryParser(new String[] {"name", "hashtags", "message", "url_titles", "timestamp", "location"}, analyzer, boosts).parse(args[0]);
       int hitsPerPage = 10;
       IndexReader reader = DirectoryReader.open(d);
       IndexSearcher searcher = new IndexSearcher(reader);
@@ -59,7 +59,7 @@ public class QueryLucene {
         System.out.print("{{\"score\" : " + hits[i].score + "}, ");
         System.out.print("{\"name\" : \"" + de.get("name") + "\"}, ");
         System.out.print("{\"message\" : \"" + de.get("message") + "\"}, ");
-        System.out.print("{\"hashtags\" : \"" + de.get("hashtags") + "}, ");
+        System.out.print("{\"hashtags\" : " + de.get("hashtags") + "}, ");
         System.out.print("{\"location\" : \"" + de.get("location") + "\"}, ");
         System.out.print("{\"url_titles\" : " + de.get("url_titles") + "}, ");
         System.out.println("{\"timestamp\" : \"" + de.get("timestamp") + "\"}}");
