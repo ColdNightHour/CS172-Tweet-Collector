@@ -56,7 +56,6 @@ public class QueryLucene {
       for(int i = 0; i < hits.length; ++i) {
         int docId = hits[i].doc;
         Document de = searcher.doc(docId);
-        System.out.println("DOC-BEG");
         System.out.print("{{\"score\" : " + hits[i].score + "}, ");
         System.out.print("{\"name\" : \"" + de.get("name") + "\"}, ");
         System.out.print("{\"message\" : \"" + de.get("message") + "\"}, ");
