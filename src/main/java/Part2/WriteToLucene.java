@@ -33,7 +33,7 @@ public class WriteToLucene {
             Document doc = new Document();
             JSONObject tweet = new JSONObject(line);
 
-            doc.add(new StringField("name", tweet.getString("name"), Field.Store.YES));
+            doc.add(new TextField("name", tweet.getString("name"), Field.Store.YES));
 
             String location = tweet.getString("location");
             doc.add(new StoredField("location", location.equals("Null") ? "" : location));
