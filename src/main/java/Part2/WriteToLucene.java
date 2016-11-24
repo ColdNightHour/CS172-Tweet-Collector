@@ -15,9 +15,10 @@ import org.nibor.autolink.LinkSpan;
 import org.nibor.autolink.LinkType;
 
 import java.io.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Created by jman0_000 on 11/19/2016.
@@ -37,12 +38,7 @@ public class WriteToLucene {
             String location = tweet.getString("location");
             doc.add(new StoredField("location", location.equals("Null") ? "" : location));
 
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH::mm:ss zzz YYY");
-                long time = sdf.parse(tweet.getString("timestamp")).getTime();
-                doc.add(new NumericDocValuesField("timestamp", time));
-            } catch (ParseException e) {
-            }
+            doc.add(new StoredField("timestamp", tweet.getString("timestamp")));
 
             String message = tweet.getString("message");
             doc.add(new TextField("message", message, Field.Store.YES));
