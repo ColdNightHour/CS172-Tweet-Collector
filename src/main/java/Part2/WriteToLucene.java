@@ -47,16 +47,18 @@ public class WriteToLucene {
                 .build();
             Iterable<LinkSpan> links = linkExtractor.extractLinks(message);
 
+            List<String> titleArr = new ArrayList<>();
             try {
                 for (LinkSpan link : links) {
                     String url = message.substring(link.getBeginIndex(), link.getEndIndex());
                     System.out.println("Getting title of: " + url);
                     try {
-                        doc.add(new TextField("url_titles", Jsoup.connect(url).get().title(), Field.Store.YES));
+                        titleArr.add(Jsoup.connect(url).get().title());
                     } catch (Exception e) {
                         System.out.println("Unable to parse URL " + url);
                     }
                 }
+                doc.add(new TextField("url_titles", titleArr.toString(), Field.Store.YES));
             } catch (NoSuchElementException e) {
                 System.out.println("No urls in this tweet!");
             }
