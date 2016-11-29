@@ -44,7 +44,6 @@ public class QueryLucene {
     Map<String, Float> boosts = new HashMap<String, Float>();
     boosts.put("message", (float)(10.0));
     try{
-      //System.out.println(args[0]);
       Query q = new MultiFieldQueryParser(new String[] {"name", "hashtags", "message", "url_titles", "timestamp", "location"}, analyzer, boosts).parse(args[0]);
       int hitsPerPage = 10;
       IndexReader reader = DirectoryReader.open(d);
@@ -52,6 +51,7 @@ public class QueryLucene {
       TopDocs docs = searcher.search(q, hitsPerPage);
       ScoreDoc[] hits = docs.scoreDocs;
       System.out.println("~HITS~");
+      System.out.println("QUERY ~~~~~~~~~~~~~~~~~~~~~~ " + args[0]);
       System.out.println("~STRT~");
       for(int i = 0; i < hits.length; ++i) {
         int docId = hits[i].doc;
